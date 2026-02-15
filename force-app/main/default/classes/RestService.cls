@@ -139,7 +139,7 @@ global with sharing class RestService {
 			Map<String, Object> itemMap = (Map<String, Object>)item;
 			sObject record = token.newSObject();
 			for (String key : itemMap.keySet()) {
-				Object val = valueForField(token, key, itemMap.get(key));//Utils.valueForField(token, key, itemMap.get(key));
+				Object val = Utils.valueForField(token, key, itemMap.get(key));
 				if (val != null) {
 					record.put(key, val);
 				}
