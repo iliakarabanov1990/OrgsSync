@@ -7,358 +7,356 @@ import getInitialData from "@salesforce/apex/RestManagerController.getInitialDat
 
 export default class RestManager extends NavigationMixin(LightningElement) {
 
-    @track _recordsData = [];
+	@track _recordsData = [];
 
-    _hideIds          = true;
-    _isLoading        = true;
-    _modalFormVisible = false;
-    _modalFormVisible = false;
-    
-    _offset = 0;
-    _limit  = 10;
-    
-    _objectApiName;
-    _modalRecordData = null;
-    _searchStr       = '';
+	_hideIds          = true;
+	_isLoading        = true;
+	_modalFormVisible = false;
+	_modalFormVisible = false;
 
-    _modalMod;
-    _fieldsInfo;
+	_offset = 0;
+	_limit  = 5;
 
-    get ui() {
-        return {
-            datatable: {
-                columns     : this.columns,
-                recordsData : this._recordsData
-            },
-            mainForm: {
-                header        : this.objectApiName,
-                isLoading     : this._isLoading,
-                isLoaded      : !this._isLoading,
-                objectOptions : this.objectOptions,
-                objectApiName : this.objectApiName,
-                searchStr     : this.searchStr
-            },
-            modalForm: {
-                header    : this.objectApiName,
-                object    : this.objectApiName,
-                fields    : this.formFields,
-                viewMode  : this._modalMod === 'view',
-                isVisible : this._modalFormVisible
-            },
-            class: {
-                modalForm : `modal-form slds-modal slds-fade-in-open slds-backdrop ${this._modalFormVisible ? '' : 'slds-hide'}`
-            },
-            show : {
-                table : this._recordsData.length > 0
-            }
-        }
-    }
+	_objectApiName;
+	_modalRecordData = null;
+	_searchStr       = '';
 
-    get disablePrevious() { return this._offset <= 0; }
+	_modalMod;
+	_fieldsInfo;
 
-    get disableNext() { return this._recordsData?.length < this._limit; } 
+	get ui() {
+		return {
+			datatable: {
+				columns     : this.columns,
+				recordsData : this._recordsData
+			},
+			mainForm: {
+				header        : this.objectApiName,
+				isLoading     : this._isLoading,
+				isLoaded      : !this._isLoading,
+				objectOptions : this.objectOptions,
+				objectApiName : this.objectApiName,
+				searchStr     : this.searchStr
+			},
+			modalForm: {
+				header    : this.objectApiName,
+				object    : this.objectApiName,
+				fields    : this.formFields,
+				viewMode  : this._modalMod === 'view',
+				isVisible : this._modalFormVisible
+			},
+			class: {
+				modalForm : `modal-form slds-modal slds-fade-in-open slds-backdrop ${this._modalFormVisible ? '' : 'slds-hide'}`
+			},
+			show : {
+				table : this._recordsData.length > 0
+			}
+		}
+	}
 
-    get objectApiName() {
-        return this._objectApiName || '';
-    }
+	get disablePrevious() { return this._offset <= 0; }
 
-    get objectOptions() {
-        return this._objectOptions || [];
-    }
+	get disableNext() { return this._recordsData?.length < this._limit; }
 
-    get searchStr() {
-        return this._searchStr || '';
-    }
-    
-    get formFields() {
+	get objectApiName() {
+		return this._objectApiName || '';
+	}
 
-        if (!this._fieldsInfo) { return []; }
+	get objectOptions() {
+		return this._objectOptions || [];
+	}
 
-        const fileds = this._fieldsInfo[this.objectApiName].formFields.map(field => ({
-            name  : field,
-            label : field,
-            value : null,
-            class : ''
-        }));
+	get searchStr() {
+		return this._searchStr || '';
+	}
 
-        fileds.push({
-            name  : 'Id',
-            label : 'Id',
-            value : null,
-            class : 'slds-hide'
-        });
+	get formFields() {
 
-        if (!this._modalRecordData) { return fileds; }
+		if (!this._fieldsInfo) { return []; }
 
-        if (this._modalMod === 'edit' || this._modalMod === 'view') {
-            for (const field of fileds) {
-                field.value = this._modalRecordData[field.name];
-            }
-        }
+		const fileds = this._fieldsInfo[this.objectApiName].formFields.map(field => ({
+			name  : field,
+			label : field,
+			value : null,
+			class : ''
+		}));
 
-        return fileds;
-    }
+		fileds.push({
+			name  : 'Id',
+			label : 'Id',
+			value : null,
+			class : 'slds-hide'
+		});
 
-    get columns() {
+		if (!this._modalRecordData) { return fileds; }
 
-        if (!this._fieldsInfo) { return []; }
+		if (this._modalMod === 'edit' || this._modalMod === 'view') {
+			for (const field of fileds) {
+				field.value = this._modalRecordData[field.name];
+			}
+		}
 
-        const columns = this._fieldsInfo[this.objectApiName].listFields.map(field => ({
-            label     : field,
-            fieldName : field,
-            type      : 'text'
-        }));
+		return fileds;
+	}
 
-        columns.push({
-            type           : 'button',
-            label          : 'View',
-            cellAttributes : { alignment: 'left' },
-            initialWidth   : 80,
-            typeAttributes : {
-                label   : 'View',
-                name    : 'view',
-                variant : 'base'
-            }         
-        });
+	get columns() {
 
-        columns.push({
-            type           : 'action',
-            typeAttributes : { rowActions: [
-                    { label: 'Delete', name: 'delete' },
-                    { label: 'Edit',   name: 'edit'   }
-                ]
-            }
-        });
+		if (!this._fieldsInfo) { return []; }
 
-        return columns;
-    }
+		const columns = this._fieldsInfo[this.objectApiName].listFields.map(field => ({
+			label     : field,
+			fieldName : field,
+			type      : 'text'
+		}));
 
-    async connectedCallback() {
-       try {
-            this.toggleSpinner(true);
+		columns.push({
+			type           : 'button',
+			label          : 'View',
+			cellAttributes : { alignment: 'left' },
+			initialWidth   : 80,
+			typeAttributes : {
+				label   : 'View',
+				name    : 'view',
+				variant : 'base'
+			}
+		});
 
-            const initialData   = await getInitialData();
-            this._fieldsInfo    = initialData.fieldsInfo;
-            this._namedCred     = initialData.namedCred;
-            const objectsList   = initialData.objectsList;
-            
-            if (objectsList.length > 0) {
-                this._objectOptions = objectsList.map(item => ({ label: item, value: item }));
-                this._objectApiName = objectsList[0];
-            }
+		columns.push({
+			type           : 'action',
+			typeAttributes : { rowActions: [
+					{ label: 'Delete', name: 'delete' },
+					{ label: 'Edit',   name: 'edit'   }
+				]
+			}
+		});
 
-            await this.getRecords();
-        } catch(error) {
-            this.dispatchEvent(new ShowToastEvent({title: 'ERROR', variant: 'error', message: error.body.message}))
-        } finally {
-          this.toggleSpinner(false);
-        }
-    }
+		return columns;
+	}
 
-    handleRowAction(event) {
-        const action = event.detail.action.name;
-        const row    = event.detail.row;
+	async connectedCallback() {
+	try {
+			this.toggleSpinner(true);
 
-        switch (action) {
-            case 'delete':
-                this.handleDeleteRecord(row.Id);
-                break;
-            case 'edit':
-                this.handleEditRecord(row);
-                break;
-            case 'view':
-                this.handleViewRecord(row);
-                break;
-            default:
-                console.log(`Unhandled action: ${action}`);
-                break;
-        }
-    }
+			const initialData   = await getInitialData();
+			this._fieldsInfo    = initialData.fieldsInfo;
+			this._namedCred     = initialData.namedCred;
+			const objectsList   = initialData.objectsList;
 
-    handleEditRecord(row) {
-        this._modalMod = 'edit';
-        this.openModal(row);
-    }
+			if (objectsList.length > 0) {
+				this._objectOptions = objectsList.map(item => ({ label: item, value: item }));
+				this._objectApiName = objectsList[0];
+			}
 
-    handleViewRecord(row) {
-        this._modalMod = 'view';
-        this.openModal(row);
-    }
+			await this.getRecords();
+		} catch(error) {
+			this.dispatchEvent(new ShowToastEvent({title: 'ERROR', variant: 'error', message: error.body.message}))
+		} finally {
+		this.toggleSpinner(false);
+		}
+	}
 
-    openModal(recordData) {
-        this._modalRecordData  = recordData;
-        this._modalFormVisible = true;
-    }
+	handleRowAction(event) {
+		const action = event.detail.action.name;
+		const row    = event.detail.row;
 
-    async handleDeleteRecord(recordId) {
-        try {
-            this.toggleSpinner(true);
+		switch (action) {
+			case 'delete':
+				this.handleDeleteRecord(row.Id);
+				break;
+			case 'edit':
+				this.handleEditRecord(row);
+				break;
+			case 'view':
+				this.handleViewRecord(row);
+				break;
+			default:
+				console.log(`Unhandled action: ${action}`);
+				break;
+		}
+	}
 
-            const param = {
-                method: 'DELETE',
-                namedCred: this._namedCred,
-                paramsMap: {
-                        'object' : this.objectApiName,
-                        'Id'     : recordId
-                    }
-                };
-        
-            const answer = await sendRequast(param);
+	handleEditRecord(row) {
+		this._modalMod = 'edit';
+		this.openModal(row);
+	}
 
-            if (answer.status === '200') { 
+	handleViewRecord(row) {
+		this._modalMod = 'view';
+		this.openModal(row);
+	}
 
-                this._recordsData.splice(this._recordsData.indexOf(this._recordsData.find(el => el.Id === recordId)), 1);
-                this._recordsData = [...this._recordsData];
+	openModal(recordData) {
+		this._modalRecordData  = recordData;
+		this._modalFormVisible = true;
+	}
 
-                this.dispatchEvent(new ShowToastEvent({title: 'Record was deleted', variant: 'success', message: JSON.stringify(answer.body)})); 
+	async handleDeleteRecord(recordId) {
+		try {
+			this.toggleSpinner(true);
 
-            } else {
-                this.dispatchEvent(new ShowToastEvent({title: 'ERROR', variant: 'error', message: JSON.parse(answer.body)[0].message}));
-            } 
-        }
-        catch(error) {
-            this.dispatchEvent(new ShowToastEvent({title: 'ERROR', variant: 'error', message: error.body.message}));
-        } finally {
-            this.toggleSpinner(false);
-        }
-    }
+			const param = {
+				method: 'DELETE',
+				namedCred: this._namedCred,
+				paramsMap: {
+						'object' : this.objectApiName,
+						'Id'     : recordId
+					}
+				};
 
-    async handleSubmitCreateForm(event) {
-        try {
-            event.preventDefault();
+			const answer = await sendRequast(param);
 
-            this.toggleSpinner(true);
+			if (answer.status === '200') {
 
-            const fieldToInsert = {};
-            for (const field of this.formFields) {
-                const fieldName = typeof field === 'string' ? field : field.name;
-                if (fieldName != null && event.detail.fields[fieldName] !== undefined) {
-                    fieldToInsert[fieldName] = event.detail.fields[fieldName];
-                }
-            }
+				this._recordsData.splice(this._recordsData.indexOf(this._recordsData.find(el => el.Id === recordId)), 1);
+				this._recordsData = [...this._recordsData];
 
-            const param = {
-                method    : this._modalMod === 'edit' ? 'PATCH' : 'POST',
-                body      : JSON.stringify([fieldToInsert]),
-                namedCred : this._namedCred,
-                paramsMap : {
-                    object : this.objectApiName
-                }
-            };
-         
-            const answer = await sendRequast(param);
+				this.dispatchEvent(new ShowToastEvent({title: 'Record was deleted', variant: 'success', message: JSON.stringify(answer.body)}));
 
-            if(answer.status === '200') { 
-                this._recordsData = [...this._recordsData, ...answer.body];
+			} else {
+				this.dispatchEvent(new ShowToastEvent({title: 'ERROR', variant: 'error', message: JSON.parse(answer.body)[0].message}));
+			}
+		}
+		catch(error) {
+			this.dispatchEvent(new ShowToastEvent({title: 'ERROR', variant: 'error', message: error.body.message}));
+		} finally {
+			this.toggleSpinner(false);
+		}
+	}
 
-                this.dispatchEvent(new ShowToastEvent({title: 'Record was created', variant: 'success', message: JSON.stringify(answer.body)})); 
+	async handleSubmitCreateForm(event) {
+		try {
+			event.preventDefault();
 
-                await this.getRecords();
-            } else {
-                this.dispatchEvent(new ShowToastEvent({title: 'ERROR', variant: 'error', message: JSON.parse(answer.body)[0].message}))
-            } 
-        } catch(error) {
-            this.dispatchEvent(new ShowToastEvent({title: 'ERROR', variant: 'error', message: error.body.message}));
-        } finally {
-            this._modalFormVisible = false;
-            this._modalMod         = 'view';
+			this.toggleSpinner(true);
 
-            this.toggleSpinner(false);
-        }
-    }
+			const fieldToInsert = {};
+			for (const field of this.formFields) {
+				const fieldName = typeof field === 'string' ? field : field.name;
+				if (fieldName != null && event.detail.fields[fieldName] !== undefined) {
+					fieldToInsert[fieldName] = event.detail.fields[fieldName];
+				}
+			}
 
-    handleNewRecord() {        
-        this._modalFormVisible = true;
-        this._modalMod         = 'create';
-    }
+			const param = {
+				method    : this._modalMod === 'edit' ? 'PATCH' : 'POST',
+				body      : JSON.stringify([fieldToInsert]),
+				namedCred : this._namedCred,
+				paramsMap : {
+					object : this.objectApiName
+				}
+			};
 
-    handleCloseForm() {
-        this._modalFormVisible = false;
-        this._modalRecordData  = null;
-    }
+			const answer = await sendRequast(param);
 
-    handleSearch(event) {
-        this._searchStr = event.currentTarget.value.trim();  
-    }
+			if(answer.status === '200') {
+				this._recordsData = [...this._recordsData, ...answer.body];
 
-    async handleSearchtButton() { 
-        this._offset = 0;
-        await this.getRecords();  
+				this.dispatchEvent(new ShowToastEvent({title: 'Record was created', variant: 'success', message: JSON.stringify(answer.body)}));
 
-        //if (this._recordsData.length > 0) { this._offset += this._limit; }
-    }
+				await this.getRecords();
+			} else {
+				this.dispatchEvent(new ShowToastEvent({title: 'ERROR', variant: 'error', message: JSON.parse(answer.body)[0].message}))
+			}
+		} catch(error) {
+			this.dispatchEvent(new ShowToastEvent({title: 'ERROR', variant: 'error', message: error.body.message}));
+		} finally {
+			this._modalFormVisible = false;
+			this._modalMod         = 'view';
 
-    toggleSpinner(isLoading) {
-        this._isLoading = isLoading;
-    }
+			this.toggleSpinner(false);
+		}
+	}
 
-    async handlePrevious() {
-        this._offset -= this._limit;   
-        await this.getRecords();
-    }
+	handleNewRecord() {
+		this._modalFormVisible = true;
+		this._modalMod         = 'create';
+	}
 
-    async handleNext() {
-        this._offset += this._limit;       
-        await this.getRecords();      
-    }
+	handleCloseForm() {
+		this._modalFormVisible = false;
+		this._modalRecordData  = null;
+	}
 
-    async getRecords() { 
-        try {
-            this._recordsData = [];
-            let answer;
+	handleSearch(event) {
+		this._searchStr = event.currentTarget.value.trim();
+	}
 
-            this.toggleSpinner(true);
+	async handleSearchtButton() {
+		this._offset = 0;
+		await this.getRecords();
+	}
 
-            const param = {
-                method     : 'GET',
-                namedCred  : this._namedCred,
-                paramsMap  : {
-                    object       : this.objectApiName,
-                    offset       : this._offset,
-                    limit        : this._limit,
-                    groupBy      : 'Name',
-                    searchString : this.searchStr,
-                    fields       : [...new Set([...this._fieldsInfo[this.objectApiName].formFields, ...this._fieldsInfo[this.objectApiName].listFields])].join(',')
-                } 
-            };  
-        
-            answer = await sendRequast(param);
-            if (answer.status !== '200') { 
-                this.dispatchEvent(new ShowToastEvent({title: 'ERROR', variant: 'error', message: JSON.parse(answer.body)[0].message}));
-                answer.body = [];
-            }
-           
-            this._recordsData = answer.body;
+	toggleSpinner(isLoading) {
+		this._isLoading = isLoading;
+	}
 
-        } catch(error) {
-            this.dispatchEvent(new ShowToastEvent({title: 'ERROR', variant: 'error', message: error.body.message}));
-        } finally {
-            this.toggleSpinner(false);
-        }
-    }
+	async handlePrevious() {
+		this._offset -= this._limit;
+		await this.getRecords();
+	}
 
-    handleSaveForm(event) {
-        switch (this._modalMod) {
-            case 'edit':
-                this.handleSubmitCreateForm(event);
-                break;
-            case 'create':
-                this.handleSubmitCreateForm(event);
-                break;
-            default:
-                console.log(`Unhandled action: ${this._modalMod}`);
-                break;
-        }
+	async handleNext() {
+		this._offset += this._limit;
+		await this.getRecords();
+	}
 
-        this.handleCloseForm();
-    }
+	async getRecords() {
+		try {
+			this._recordsData = [];
+			let answer;
+
+			this.toggleSpinner(true);
+
+			const param = {
+				method     : 'GET',
+				namedCred  : this._namedCred,
+				paramsMap  : {
+					object       : this.objectApiName,
+					offset       : this._offset,
+					limit        : this._limit,
+					groupBy      : 'Name',
+					searchString : this.searchStr,
+					fields       : [...new Set([...this._fieldsInfo[this.objectApiName].formFields, ...this._fieldsInfo[this.objectApiName].listFields])].join(',')
+				}
+			};
+
+			answer = await sendRequast(param);
+			if (answer.status !== '200') {
+				this.dispatchEvent(new ShowToastEvent({title: 'ERROR', variant: 'error', message: JSON.parse(answer.body)[0].message}));
+				answer.body = [];
+			}
+
+			this._recordsData = answer.body;
+
+		} catch(error) {
+			this.dispatchEvent(new ShowToastEvent({title: 'ERROR', variant: 'error', message: error.body.message}));
+		} finally {
+			this.toggleSpinner(false);
+		}
+	}
+
+	handleSaveForm(event) {
+		switch (this._modalMod) {
+			case 'edit':
+				this.handleSubmitCreateForm(event);
+				break;
+			case 'create':
+				this.handleSubmitCreateForm(event);
+				break;
+			default:
+				console.log(`Unhandled action: ${this._modalMod}`);
+				break;
+		}
+
+		this.handleCloseForm();
+	}
 
 
 
-    async handleObjectChange(event) {
-        this._objectApiName = event.detail.value;
-        this._recordsData   = [];
-        this._offset        = 0;
-        await this.getRecords();
-    }
+	async handleObjectChange(event) {
+		this._objectApiName = event.detail.value;
+		this._recordsData   = [];
+		this._offset        = 0;
+		await this.getRecords();
+	}
 }

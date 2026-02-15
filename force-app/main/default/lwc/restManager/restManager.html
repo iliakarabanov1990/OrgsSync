@@ -14,11 +14,11 @@
         </div>
         <header class="slds-page-header">
             <div class="slds-grid slds-wrap slds-grid_align-spread slds-m-bottom_small">
-                <div class="slds-col slds-size_8-of-12">  
+                <div class="slds-col slds-size_8-of-12">
                     <div class="slds-text-heading_large">
                         <lightning-icon icon-name="standard:account" size="large" class="slds-m-right_medium"></lightning-icon>
                         {ui.mainForm.header}
-                    </div>                                
+                    </div>
                 </div>
                 <div class="slds-col slds-size_2-of-12">
                     <lightning-button
@@ -28,14 +28,14 @@
                         onclick={handleNewRecord}
                         class  ="button slds-col"
                     >
-                    </lightning-button>    
+                    </lightning-button>
                 </div>
             </div>
 
             <div class="slds-grid slds-wrap slds-grid_align-spread slds-m-bottom_small">
-                <div class="slds-col slds-size_2-of-12"> 
+                <div class="slds-col slds-size_2-of-12">
                 </div>
-                <div class="slds-col slds-size_6-of-12">    
+                <div class="slds-col slds-size_6-of-12">
                     <lightning-input
                         type       ="search"
                         value      ={ui.mainForm.searchStr}
@@ -52,26 +52,26 @@
                         label  ="Find"
                         title  ="Find Records In Foreign Org"
                         class  ="button slds-col"
-                        onclick={handleSearchtButton} 
-                    >                                   
-                    </lightning-button>       
+                        onclick={handleSearchtButton}
+                    >
+                    </lightning-button>
                 </div>
             </div>
         </header>
 
-        <template lwc:if={ui.show.table} >   
-            <div class="slds-modal__content slds-p-around_small" style="height: calc(47vh) !important; max-height: calc(47vh) !important; overflow-x: hidden;">                      
+        <template lwc:if={ui.show.table} >
+            <div class="slds-modal__content slds-p-around_small" style="height: calc(40vh) !important; max-height: calc(40vh) !important; overflow-x: hidden;">
                 <lightning-datatable
                         key-field  ="Id"
                         columns    ={ui.datatable.columns}
-                        data       ={ui.datatable.recordsData}                    
+                        data       ={ui.datatable.recordsData}
                         class      ="slds-text-body_small"
                         onrowaction={handleRowAction}
                         onsave     ={handleUpdateSelectedRecords}
                         hide-checkbox-column
                 >
                 </lightning-datatable>
-            </div>                              
+            </div>
         </template>
         <footer class="slds-align_absolute-center slds-m-top_medium slds-m-bottom_medium">
             <lightning-button label="Previous" variant="brand" onclick={handlePrevious} icon-name="utility:chevronleft" disabled={disablePrevious} class="slds-m-right_small"></lightning-button>
@@ -89,7 +89,7 @@
                 title           ="Cancel"
                 aria-label      ="Cancel"
                 onclick         ={handleCloseForm}
-            ></lightning-button-icon>          
+            ></lightning-button-icon>
             <c-record-form
                 object-api-name={ui.modalForm.object}
                 fields         ={ui.modalForm.fields}
@@ -101,7 +101,7 @@
         </div>
     </section>
 
-    <template lwc:if={ui.mainForm.isLoading}>  
+    <template lwc:if={ui.mainForm.isLoading}>
         <lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
     </template>
 </template>

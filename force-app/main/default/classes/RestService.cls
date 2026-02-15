@@ -34,6 +34,8 @@ global with sharing class RestService {
 			}
 
 			if (String.isNotBlank(searchString)) {
+				searchString += '*';
+
 				String soslQuery =
 				'FIND :searchString '      +
 				'IN ALL FIELDS RETURNING ' +
