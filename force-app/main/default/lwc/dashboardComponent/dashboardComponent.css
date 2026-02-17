@@ -1,0 +1,13 @@
+.datatable-scroll-wrapper {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.chart-column {
+    min-width: 0;
+}
+
+.chart-container {
+    height: 300px;
+    position: relative;
+}

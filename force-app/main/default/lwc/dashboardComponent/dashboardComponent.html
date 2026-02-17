@@ -1,45 +1,30 @@
 <template>
-	<lightning-card title="Accounts Dashboard" icon-name="standard:account">
-		<template if:true={error}>
-			<div class="slds-text-color_error slds-p-around_medium">{error}</div>
-		</template>
+    <lightning-card title="Accounts Dashboard" icon-name="standard:account">
+        <template lwc:if={error}>
+            <div class="slds-text-color_error slds-p-around_medium" role="alert">{error}</div>
+        </template>
 
-		<template if:true={reportData}>
-			<div class="slds-p-around_medium">
-				<lightning-formatted-number value={kpiTotal} format-style="decimal"></lightning-formatted-number>
-				<span>Total Accounts</span>
-			</div>
+        <template lwc:if={reportData}>
+            <div class="slds-p-around_medium slds-text-heading_small">
+                <lightning-formatted-number value={kpiTotal} format-style="decimal"></lightning-formatted-number>
+                <span class="slds-m-left_x-small">Total Accounts</span>
+            </div>
 
-			<div class="slds-p-around_medium slds-scrollable_x">
-				<table class="slds-table slds-table_cell-buffer slds-table_bordered">
-					<thead>
-						<tr>
-							<th>Owner</th>
-							<th>Account Name</th>
-							<th>Billing State</th>
-							<th>Type</th>
-							<th>Rating</th>
-							<th>Last Activity</th>
-						</tr>
-					</thead>
-					<tbody>
-						<template for:each={tableRows} for:item="row">
-							<tr key={row.col0}>
-								<td>{row.col1}</td>
-								<td>{row.col2}</td>
-								<td>{row.col3}</td>
-								<td>{row.col4}</td>
-								<td>{row.col5}</td>
-								<td>{row.col6}</td>
-							</tr>
-						</template>
-					</tbody>
-				</table>
-			</div>
-
-			<div class="slds-p-around_medium" style="height:300px;">
-				<canvas class="chart" lwc:dom="manual"></canvas>
-			</div>
-		</template>
-	</lightning-card>
+            <div class="slds-grid slds-gutters slds-wrap slds-p-around_medium">
+                <div class="slds-col slds-size_12-of-12 slds-medium-size_8-of-12 datatable-scroll-wrapper">
+                    <lightning-datatable
+                        key-field="rowId"
+                        columns={tableColumns}
+                        data={tableRows}
+                        hide-checkbox-column>
+                    </lightning-datatable>
+                </div>
+                <div class="slds-col slds-size_12-of-12 slds-medium-size_4-of-12 chart-column">
+                    <div class="chart-container">
+                        <canvas class="chart" lwc:dom="manual" aria-label="Accounts rating distribution chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </lightning-card>
 </template>
