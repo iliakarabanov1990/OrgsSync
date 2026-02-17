@@ -5,7 +5,7 @@ import { NavigationMixin }         from "lightning/navigation";
 import sendRequast    from "@salesforce/apex/RestManagerController.sendRequast";
 import getInitialData from "@salesforce/apex/RestManagerController.getInitialData";
 
-export default class RestManager extends NavigationMixin(LightningElement) {
+export default class RestManager extends LightningElement {
 
 	@track _recordsData = [];
 

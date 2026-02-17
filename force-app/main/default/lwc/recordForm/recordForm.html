@@ -1,41 +1,41 @@
 <template>
-    <div class="slds-modal__header slds-text-heading_medium slds-text-align_center">
-        {objectApiName}
-    </div>
-    <div class="slds-modal__content slds-p-around_medium custom-modal-container">
-        <lightning-record-edit-form
-            object-api-name={ui.objectApiName}
-            onsubmit      ={handleSubmit}
-        >
-            <div class="slds-grid slds-gutters slds-wrap">
-                <template for:each={ui.fields} for:item="field">
-                    <div key={field.name} class="slds-col slds-size_1-of-2">
-                        <lightning-input-field
-                            field-name={field.name}
-                            value     ={field.value}
-                            disabled  ={ui.viewMode}
-                            class     ={field.class}
-                        ></lightning-input-field>
-                    </div>
-                </template>
-            </div>
-            <div class="slds-grid slds-grid_align-end">
-                <lightning-button
-                    variant="neutral"
-                    label  ="Cancel"
-                    type   ="button"
-                    onclick={handleClose}
-                    class  ="slds-m-right_small"
-                ></lightning-button>
-                <lightning-button
-                    variant="brand"
-                    label  ="Save"
-                    type   ="submit"
-                    class  ={ui.class.saveButton}
-                ></lightning-button>
-            </div>
-        </lightning-record-edit-form>
-    </div>
-    <div class="slds-modal__footer slds-grid slds-grid_align-end">
-    </div>
+	<div class="slds-modal__header slds-text-heading_medium slds-text-align_center">
+		{objectApiName}
+	</div>
+	<div class="slds-modal__content slds-p-around_medium custom-modal-container">
+		<lightning-record-edit-form
+			object-api-name={ui.objectApiName}
+			onsubmit      ={handleSubmit}
+		>
+			<div class="slds-grid slds-gutters slds-wrap">
+				<template for:each={ui.fields} for:item="field">
+					<div key={field.name} class="slds-col slds-size_1-of-2">
+						<lightning-input-field
+							field-name={field.name}
+							value     ={field.value}
+							disabled  ={ui.viewMode}
+							class     ={field.class}
+						></lightning-input-field>
+					</div>
+				</template>
+			</div>
+			<div class="slds-grid slds-grid_align-end">
+				<lightning-button
+					variant="neutral"
+					label  ="Cancel"
+					type   ="button"
+					onclick={handleClose}
+					class  ="slds-m-right_small"
+				></lightning-button>
+				<lightning-button
+					variant="brand"
+					label  ="Save"
+					type   ="submit"
+					class  ={ui.class.saveButton}
+				></lightning-button>
+			</div>
+		</lightning-record-edit-form>
+	</div>
+	<div class="slds-modal__footer slds-grid slds-grid_align-end">
+	</div>
 </template>
