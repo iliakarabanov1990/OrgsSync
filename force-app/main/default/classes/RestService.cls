@@ -7,19 +7,29 @@ global with sharing class RestService {
 			RestRequest request = RestContext.request;
 			Map<String, String> requestParams = request.params;
 
-			String objectParam = String.escapeSingleQuotes(requestParams.get('object'));
+			String objectParam = requestParams.get('object');
 			if (String.isBlank(objectParam)) {
 				RestContext.response.statusCode = 400;
 				throw new RestServiceException('Missing query parameter: object');
 			}
+			objectParam = String.escapeSingleQuotes(objectParam);
 
 			String fieldsParam = requestParams.get('fields');
-			fieldsParam        = fieldsParam.replaceAll('[^a-zA-Z0-9_,]', '');
+			if (String.isBlank(fieldsParam)) {
+				RestContext.response.statusCode = 400;
+				throw new RestServiceException('Missing query parameter: fields');
+			}
+			fieldsParam = fieldsParam.replaceAll('[^a-zA-Z0-9_,]', '');
 
-			String limitStr     = String.escapeSingleQuotes(requestParams.get('limit'));
-			String offsetStr    = String.escapeSingleQuotes(requestParams.get('offset'));
-			String groupBy      = String.escapeSingleQuotes(requestParams.get('groupBy'));
-			String searchString = String.escapeSingleQuotes(requestParams.get('searchString'));
+			String limitStr   = requestParams.get('limit');
+			String offsetStr  = requestParams.get('offset');
+			String groupBy    = requestParams.get('groupBy');
+			String searchString = requestParams.get('searchString');
+
+			limitStr     = String.isNotBlank(limitStr)     ? String.escapeSingleQuotes(limitStr)   : '';
+			offsetStr    = String.isNotBlank(offsetStr)    ? String.escapeSingleQuotes(offsetStr)  : '';
+			groupBy      = String.isNotBlank(groupBy)      ? String.escapeSingleQuotes(groupBy)     : '';
+			searchString = String.isNotBlank(searchString) ? String.escapeSingleQuotes(searchString) : '';
 
 			if (String.isBlank(groupBy)) {
 				RestContext.response.statusCode = 400;
@@ -94,12 +104,20 @@ global with sharing class RestService {
 	@HttpDelete
 	global static List<sObject> deleteRecord() {
 		try {
-			String recordId    = String.escapeSingleQuotes(RestContext.request.params.get('Id'));
-			String objectParam = String.escapeSingleQuotes(RestContext.request.params.get('object'));
+			String recordId    = RestContext.request.params.get('Id');
+			String objectParam = RestContext.request.params.get('object');
+
+			if (String.isBlank(recordId) || String.isBlank(objectParam)) {
+				RestContext.response.statusCode = 400;
+				throw new RestServiceException('Missing query parameter: Id or object');
+			}
+
+			recordId    = String.escapeSingleQuotes(recordId);
+			objectParam = String.escapeSingleQuotes(objectParam);
 
 			List<sObject> records = Database.queryWithBinds (
-				'SELECT Name, Id'        +
-				' FROM '                 + objectParam +
+				'SELECT  Id' +
+				' FROM '     + objectParam +
 				' WHERE Id = :recordId',
 				new Map<String, Object>{ 'recordId' => recordId },
 				AccessLevel.USER_MODE
@@ -122,11 +140,14 @@ global with sharing class RestService {
 	global static List<SObject> getRecordToUpsert() {
 
 		RestRequest request   = RestContext.request;
-		String objectTypeName = String.escapeSingleQuotes(request.params.get('object'));
+		Map<String, String> params = request.params;
+		String objectTypeName = (params != null) ? params.get('object') : null;
 		if (String.isBlank(objectTypeName)) {
 			RestContext.response.statusCode = 400;
 			throw new RestServiceException('Missing query parameter: object');
 		}
+		
+		objectTypeName = String.escapeSingleQuotes(objectTypeName);
 
 		SObjectType token = Schema.getGlobalDescribe().get(objectTypeName);
 		if (token == null) {

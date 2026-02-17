@@ -1,13 +1,13 @@
 public with sharing class Utils {
     public static Set<String> getFieldSetFields(FieldSet fieldSet) {
-		Set<String> fields = new Set<String>();
-		for (FieldSetMember fieldSetMember : fieldSet.getFields()) {
-			String fieldPath = fieldSetMember.getFieldPath();
-			if (fieldPath.contains('.')) { continue; }
-			fields.add(fieldPath);
-		}
-		return fields;
-	}
+        Set<String> fields = new Set<String>();
+        for (FieldSetMember fieldSetMember : fieldSet.getFields()) {
+            String fieldPath = fieldSetMember.getFieldPath();
+            if (fieldPath.contains('.')) { continue; }
+            fields.add(fieldPath);
+        }
+        return fields;
+    }
 
     public static Object valueForField(SObjectType sobjectType, String fieldName, Object value) {
         if (value == null) { return null; }
