@@ -1,5 +1,5 @@
 import { LightningElement, wire } from 'lwc';
-import getCrossOrgData from '@salesforce/apex/CrossOrgDashboardController.getCrossOrgData';
+import getCrossOrgData from '@salesforce/apex/DashboardComponentController.getCrossOrgData';
 import { loadScript } from 'lightning/platformResourceLoader';
 import chartjs from '@salesforce/resourceUrl/chartjs';
 
