@@ -33,4 +33,14 @@ public with sharing class Utils {
 			when else                      { return value; }
 		}
 	}
+
+	public static String typeForField(SObjectType sObjectType, String fieldName) {
+
+		Schema.SObjectField fieldToken = sObjectType.getDescribe().fields.getMap().get(fieldName);
+
+		if (fieldToken == null) { return 'string'; }
+
+		Schema.DescribeFieldResult df = fieldToken.getDescribe();
+		return df.getType().name().toLowerCase();
+	}
 }

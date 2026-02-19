@@ -111,12 +111,18 @@ export default class RestManager extends LightningElement {
 
 		if (!this._fieldsInfo) { return []; }
 
-		const columns = this._fieldsInfo[this.objectApiName].listFields.map((field, index) => ({
-			label     : field,
-			fieldName : field,
-			type      : index === 0 ? 'button' : 'text',
-			...(index === 0 ? this.getOpenRecordColumn(field) : {}),
-		}));
+		const columns = [];
+		const listFields = this._fieldsInfo[this.objectApiName].listFields;
+		let isFirst = true;
+		for (const key in listFields) {
+			columns.push({
+				label     : key,
+				fieldName : key,
+				type      : isFirst ? 'button' : listFields[key],
+				...(isFirst ? this.getOpenRecordColumn(key) : {}),
+			});
+			isFirst = false;
+		}
 
 		columns.push({
 			type           : 'action',
@@ -270,6 +276,12 @@ export default class RestManager extends LightningElement {
 
 			this.toggleSpinner(true);
 
+			const listFieldsName = [];
+			const listFields = this._fieldsInfo[this.objectApiName].listFields;
+			for (const key in listFields) {
+				listFieldsName.push(key);
+			}
+
 			const param = {
 				method     : 'GET',
 				namedCred  : this._namedCred,
@@ -279,7 +291,11 @@ export default class RestManager extends LightningElement {
 					limit        : this._limit,
 					groupBy      : 'Name',
 					searchString : this.searchStr,
-					fields       : [...new Set([...this._fieldsInfo[this.objectApiName].formFields, ...this._fieldsInfo[this.objectApiName].listFields])].join(',')
+					fields       : [
+						...new Set (
+							[...this._fieldsInfo[this.objectApiName].formFields, ...listFieldsName]
+						)
+					].join(',')
 				}
 			};
 

@@ -8,13 +8,17 @@ public with sharing class RestManagerController {
 		String objectsStr = restSettings.Objects__c;
 		List<String> objectNames = String.isBlank(objectsStr) ? new List<String>{'Account'} : objectsStr.split(', ');
 
-		Map<String, Map<String, Set<String>>> fieldsInfo = new Map<String, Map<String, Set<String>>>();
+		Map<String, Object> fieldsInfo = new Map<String, Object>();
 		for (String objectName : objectNames) {
 			Set<String> formFields = getFieldSetFields(objectName, 'Record_Form');
 			Set<String> listFields = getFieldSetFields(objectName, 'List');
-			fieldsInfo.put(objectName, new Map<String, Set<String>> {
+			Map<String, Object> formFieldsMap = new Map<String, Object>();
+			for (String field : listFields) {
+				formFieldsMap.put(field, Utils.typeForField(Schema.getGlobalDescribe().get(objectName), field));
+			}
+			fieldsInfo.put(objectName, new Map<String, Object> {
 				'formFields' => formFields,
-				'listFields' => listFields
+				'listFields' => formFieldsMap
 			});
 		}
 
