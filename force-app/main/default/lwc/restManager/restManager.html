@@ -1,107 +1,107 @@
 <template>
-    <div lwc:if={ui.mainForm.isLoaded} class="slds-card slds-card_boundary slds-grid slds-grid--vertical wrapper-card">
-        <div class="slds-grid slds-p-around_medium slds-border_bottom">
-            <div class="slds-col slds-size_4-of-12">
-            <lightning-combobox
-                    name       ="object"
-                    label      ="Object"
-                    value      ={ui.mainForm.objectApiName}
-                    placeholder="Select an object"
-                    options    ={ui.mainForm.objectOptions}
-                    onchange   ={handleObjectChange}
-                ></lightning-combobox>
-            </div>
-        </div>
-        <header class="slds-page-header">
-            <div class="slds-grid slds-wrap slds-grid_align-spread slds-m-bottom_small">
-                <div class="slds-col slds-size_8-of-12">
-                    <div class="slds-text-heading_large">
-                        <lightning-icon icon-name="standard:account" size="large" class="slds-m-right_medium"></lightning-icon>
-                        {ui.mainForm.header}
-                    </div>
-                </div>
-                <div class="slds-col slds-size_2-of-12">
-                    <lightning-button
-                        variant="brand"
-                        label  ="Create New"
-                        title  ="Create New Record In Remote Org"
-                        onclick={handleNewRecord}
-                        class  ="button slds-col"
-                    >
-                    </lightning-button>
-                </div>
-            </div>
+	<div lwc:if={ui.mainForm.isLoaded} class="slds-card slds-card_boundary slds-grid slds-grid--vertical wrapper-card">
+		<div class="slds-grid slds-p-around_medium slds-border_bottom">
+			<div class="slds-col slds-size_4-of-12">
+			<lightning-combobox
+					name       ="object"
+					label      ="Object"
+					value      ={ui.mainForm.objectApiName}
+					placeholder="Select an object"
+					options    ={ui.mainForm.objectOptions}
+					onchange   ={handleObjectChange}
+				></lightning-combobox>
+			</div>
+		</div>
+		<header class="slds-page-header">
+			<div class="slds-grid slds-wrap slds-grid_align-spread slds-m-bottom_small">
+				<div class="slds-col slds-size_8-of-12">
+					<div class="slds-text-heading_large">
+						<lightning-icon icon-name="standard:account" size="large" class="slds-m-right_medium"></lightning-icon>
+						{ui.mainForm.header}
+					</div>
+				</div>
+				<div class="slds-col slds-size_2-of-12">
+					<lightning-button
+						variant="brand"
+						label  ="Create New"
+						title  ="Create New Record In Remote Org"
+						onclick={handleNewRecord}
+						class  ="button slds-col"
+					>
+					</lightning-button>
+				</div>
+			</div>
 
-            <div class="slds-grid slds-wrap slds-grid_align-spread slds-m-bottom_small">
-                <div class="slds-col slds-size_2-of-12">
-                </div>
-                <div class="slds-col slds-size_6-of-12">
-                    <lightning-input
-                        type       ="search"
-                        value      ={ui.mainForm.searchStr}
-                        placeholder="Search Records By Name"
-                        title      ="Search Records By Name"
-                        variant    ="label-hidden"
-                        onchange   ={handleSearch}
-                    >
-                    </lightning-input>
-                </div>
-                <div class="slds-col slds-size_2-of-12">
-                    <lightning-button
-                        variant="brand"
-                        label  ="Find"
-                        title  ="Find Records In Foreign Org"
-                        class  ="button slds-col"
-                        onclick={handleSearchtButton}
-                    >
-                    </lightning-button>
-                </div>
-            </div>
-        </header>
+			<div class="slds-grid slds-wrap slds-grid_align-spread slds-m-bottom_small">
+				<div class="slds-col slds-size_2-of-12">
+				</div>
+				<div class="slds-col slds-size_6-of-12">
+					<lightning-input
+						type       ="search"
+						value      ={ui.mainForm.searchStr}
+						placeholder="Search Records By Name"
+						title      ="Search Records By Name"
+						variant    ="label-hidden"
+						onchange   ={handleSearch}
+					>
+					</lightning-input>
+				</div>
+				<div class="slds-col slds-size_2-of-12">
+					<lightning-button
+						variant="brand"
+						label  ="Find"
+						title  ="Find Records In Foreign Org"
+						class  ="button slds-col"
+						onclick={handleSearchtButton}
+					>
+					</lightning-button>
+				</div>
+			</div>
+		</header>
 
-        <template lwc:if={ui.show.table} >
-            <div class="slds-modal__content slds-p-around_small" style="height: calc(40vh) !important; max-height: calc(40vh) !important; overflow-x: hidden;">
-                <lightning-datatable
-                        key-field  ="Id"
-                        columns    ={ui.datatable.columns}
-                        data       ={ui.datatable.recordsData}
-                        class      ="slds-text-body_small"
-                        onrowaction={handleRowAction}
-                        onsave     ={handleUpdateSelectedRecords}
-                        hide-checkbox-column
-                >
-                </lightning-datatable>
-            </div>
-        </template>
-        <footer class="slds-align_absolute-center slds-m-top_medium slds-m-bottom_medium">
-            <lightning-button label="Previous" variant="brand" onclick={handlePrevious} icon-name="utility:chevronleft" disabled={disablePrevious} class="slds-m-right_small"></lightning-button>
-            <lightning-button label="Next" onclick={handleNext} variant="brand" icon-name="utility:chevronright" disabled={disableNext}></lightning-button>
-        </footer>
-    </div>
+		<template lwc:if={ui.show.table} >
+			<div class="slds-modal__content slds-p-around_small" style="height: calc(40vh) !important; max-height: calc(40vh) !important; overflow-x: hidden;">
+				<lightning-datatable
+						key-field  ="Id"
+						columns    ={ui.datatable.columns}
+						data       ={ui.datatable.recordsData}
+						class      ="slds-text-body_small"
+						onrowaction={handleRowAction}
+						onsave     ={handleUpdateSelectedRecords}
+						hide-checkbox-column
+				>
+				</lightning-datatable>
+			</div>
+		</template>
+		<footer class="slds-align_absolute-center slds-m-top_medium slds-m-bottom_medium">
+			<lightning-button label="Previous" variant="brand" onclick={handlePrevious} icon-name="utility:chevronleft" disabled={disablePrevious} class="slds-m-right_small"></lightning-button>
+			<lightning-button label="Next" onclick={handleNext} variant="brand" icon-name="utility:chevronright" disabled={disableNext}></lightning-button>
+		</footer>
+	</div>
 
-    <section lwc:if={ui.modalForm.isVisible} class="modal-form slds-modal slds-fade-in-open slds-backdrop">
-        <div class="slds-modal__container center-modal">
-            <lightning-button-icon
-                class           ="slds-modal__close slds-button slds-button_icon"
-                icon-name       ="utility:close"
-                variant         ="bare"
-                alternative-text="Cancel"
-                title           ="Cancel"
-                aria-label      ="Cancel"
-                onclick         ={handleCloseForm}
-            ></lightning-button-icon>
-            <c-record-form
-                object-api-name={ui.modalForm.object}
-                fields         ={ui.modalForm.fields}
-                record-data    ={ui.modalForm.recordData}
-                view-mode      ={ui.modalForm.viewMode}
-                onsave         ={handleSaveForm}
-                onclose        ={handleCloseForm}>
-            </c-record-form>
-        </div>
-    </section>
+	<section lwc:if={ui.modalForm.isVisible} class="modal-form slds-modal slds-fade-in-open slds-backdrop">
+		<div class="slds-modal__container center-modal">
+			<lightning-button-icon
+				class           ="slds-modal__close slds-button slds-button_icon"
+				icon-name       ="utility:close"
+				variant         ="bare"
+				alternative-text="Cancel"
+				title           ="Cancel"
+				aria-label      ="Cancel"
+				onclick         ={handleCloseForm}
+			></lightning-button-icon>
+			<c-record-form
+				object-api-name={ui.modalForm.object}
+				fields         ={ui.modalForm.fields}
+				record-data    ={ui.modalForm.recordData}
+				view-mode      ={ui.modalForm.viewMode}
+				onsave         ={handleSaveForm}
+				onclose        ={handleCloseForm}>
+			</c-record-form>
+		</div>
+	</section>
 
-    <template lwc:if={ui.mainForm.isLoading}>
-        <lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
-    </template>
+	<template lwc:if={ui.mainForm.isLoading}>
+		<lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+	</template>
 </template>

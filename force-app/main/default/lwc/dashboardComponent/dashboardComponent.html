@@ -1,30 +1,26 @@
 <template>
-    <lightning-card title="Accounts Dashboard" icon-name="standard:account">
-        <template lwc:if={error}>
-            <div class="slds-text-color_error slds-p-around_medium" role="alert">{error}</div>
-        </template>
+	<lightning-card title="Accounts Dashboard" icon-name="standard:account">
+		<template lwc:if={ui.show.reportData}>
+			<div class="slds-p-around_medium slds-text-heading_small">
+				<lightning-formatted-number value={ui.reportData.kpiTotal} format-style="decimal"></lightning-formatted-number>
+				<span class="slds-m-left_x-small">Total Accounts</span>
+			</div>
 
-        <template lwc:if={reportData}>
-            <div class="slds-p-around_medium slds-text-heading_small">
-                <lightning-formatted-number value={kpiTotal} format-style="decimal"></lightning-formatted-number>
-                <span class="slds-m-left_x-small">Total Accounts</span>
-            </div>
-
-            <div class="slds-grid slds-gutters slds-wrap slds-p-around_medium">
-                <div class="slds-col slds-size_12-of-12 slds-medium-size_8-of-12 datatable-scroll-wrapper">
-                    <lightning-datatable
-                        key-field="rowId"
-                        columns={tableColumns}
-                        data={tableRows}
-                        hide-checkbox-column>
-                    </lightning-datatable>
-                </div>
-                <div class="slds-col slds-size_12-of-12 slds-medium-size_4-of-12 chart-column">
-                    <div class="chart-container">
-                        <canvas class="chart" lwc:dom="manual" aria-label="Accounts rating distribution chart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </template>
-    </lightning-card>
+			<div class="slds-grid slds-gutters slds-wrap slds-p-around_medium">
+				<div class="slds-col slds-size_12-of-12 slds-medium-size_8-of-12 datatable-scroll-wrapper">
+					<lightning-datatable
+						key-field="rowId"
+						columns  ={ui.reportData.tableColumns}
+						data     ={ui.reportData.tableRows}
+						hide-checkbox-column>
+					</lightning-datatable>
+				</div>
+				<div class="slds-col slds-size_12-of-12 slds-medium-size_4-of-12 chart-column">
+					<div class="chart-container">
+						<canvas class="chart" lwc:dom="manual" aria-label="Accounts rating distribution chart"></canvas>
+					</div>
+				</div>
+			</div>
+		</template>
+	</lightning-card>
 </template>

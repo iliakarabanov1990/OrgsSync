@@ -1,6 +1,5 @@
 import { LightningElement, track } from 'lwc';
 import { ShowToastEvent }          from 'lightning/platformShowToastEvent';
-import { NavigationMixin }         from "lightning/navigation";
 
 import sendRequast    from "@salesforce/apex/RestManagerController.sendRequast";
 import getInitialData from "@salesforce/apex/RestManagerController.getInitialData";
@@ -350,8 +349,6 @@ export default class RestManager extends LightningElement {
 
 		this.handleCloseForm();
 	}
-
-
 
 	async handleObjectChange(event) {
 		this._objectApiName = event.detail.value;
