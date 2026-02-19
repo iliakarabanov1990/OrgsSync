@@ -1,5 +1,6 @@
 import { LightningElement, track } from 'lwc';
 import { ShowToastEvent }          from 'lightning/platformShowToastEvent';
+import LightningConfirm            from 'lightning/confirm';
 
 import sendRequast    from "@salesforce/apex/RestManagerController.sendRequast";
 import getInitialData from "@salesforce/apex/RestManagerController.getInitialData";
@@ -73,58 +74,56 @@ export default class RestManager extends LightningElement {
 
 		if (!this._fieldsInfo) { return []; }
 
-		const fileds = this._fieldsInfo[this.objectApiName].formFields.map(field => ({
+		const fields = this._fieldsInfo[this.objectApiName].formFields.map(field => ({
 			name  : field,
 			label : field,
 			value : null,
 			class : ''
 		}));
 
-		fileds.push({
+		fields.push({
 			name  : 'Id',
 			label : 'Id',
 			value : null,
 			class : 'slds-hide'
 		});
 
-		if (!this._modalRecordData) { return fileds; }
+		if (!this._modalRecordData) { return fields; }
 
 		if (this._modalMod === 'edit' || this._modalMod === 'view') {
-			for (const field of fileds) {
+			for (const field of fields) {
 				field.value = this._modalRecordData[field.name];
 			}
 		}
 
-		return fileds;
+		return fields;
+	}
+
+	getOpenRecordColumn(fieldName) {
+		return {
+			typeAttributes : {
+				label : { fieldName }, name : 'edit', variant : 'base', title : { fieldName }
+			}
+		};
 	}
 
 	get columns() {
 
 		if (!this._fieldsInfo) { return []; }
 
-		const columns = this._fieldsInfo[this.objectApiName].listFields.map(field => ({
+		const columns = this._fieldsInfo[this.objectApiName].listFields.map((field, index) => ({
 			label     : field,
 			fieldName : field,
-			type      : 'text'
+			type      : index === 0 ? 'button' : 'text',
+			...(index === 0 ? this.getOpenRecordColumn(field) : {}),
 		}));
-
-		columns.push({
-			type           : 'button',
-			label          : 'View',
-			cellAttributes : { alignment: 'left' },
-			initialWidth   : 80,
-			typeAttributes : {
-				label   : 'View',
-				name    : 'view',
-				variant : 'base'
-			}
-		});
 
 		columns.push({
 			type           : 'action',
 			typeAttributes : { rowActions: [
 					{ label: 'Delete', name: 'delete' },
-					{ label: 'Edit',   name: 'edit'   }
+					{ label: 'Edit',   name: 'edit'   },
+					{ label: 'View',   name: 'view'   }
 				]
 			}
 		});
@@ -191,6 +190,15 @@ export default class RestManager extends LightningElement {
 
 	async handleDeleteRecord(recordId) {
 		try {
+
+			if (!(await LightningConfirm.open (
+				{
+					message : 'Are you sure you want to delete the record?',
+					theme   : 'info',
+					label   : 'Delete record'
+				}
+			))) {return; }
+
 			this.toggleSpinner(true);
 
 			const param = {
@@ -218,50 +226,6 @@ export default class RestManager extends LightningElement {
 		catch(error) {
 			this.dispatchEvent(new ShowToastEvent({title: 'ERROR', variant: 'error', message: error.body.message}));
 		} finally {
-			this.toggleSpinner(false);
-		}
-	}
-
-	async handleSubmitCreateForm(event) {
-		try {
-			event.preventDefault();
-
-			this.toggleSpinner(true);
-
-			const fieldToInsert = {};
-			for (const field of this.formFields) {
-				const fieldName = typeof field === 'string' ? field : field.name;
-				if (fieldName != null && event.detail.fields[fieldName] !== undefined) {
-					fieldToInsert[fieldName] = event.detail.fields[fieldName];
-				}
-			}
-
-			const param = {
-				method    : this._modalMod === 'edit' ? 'PATCH' : 'POST',
-				body      : JSON.stringify([fieldToInsert]),
-				namedCred : this._namedCred,
-				paramsMap : {
-					object : this.objectApiName
-				}
-			};
-
-			const answer = await sendRequast(param);
-
-			if(answer.status === '200') {
-				this._recordsData = [...this._recordsData, ...answer.body];
-
-				this.dispatchEvent(new ShowToastEvent({title: 'Record was created', variant: 'success', message: JSON.stringify(answer.body)}));
-
-				await this.getRecords();
-			} else {
-				this.dispatchEvent(new ShowToastEvent({title: 'ERROR', variant: 'error', message: JSON.parse(answer.body)[0].message}))
-			}
-		} catch(error) {
-			this.dispatchEvent(new ShowToastEvent({title: 'ERROR', variant: 'error', message: error.body.message}));
-		} finally {
-			this._modalFormVisible = false;
-			this._modalMod         = 'view';
-
 			this.toggleSpinner(false);
 		}
 	}
@@ -334,20 +298,48 @@ export default class RestManager extends LightningElement {
 		}
 	}
 
-	handleSaveForm(event) {
-		switch (this._modalMod) {
-			case 'edit':
-				this.handleSubmitCreateForm(event);
-				break;
-			case 'create':
-				this.handleSubmitCreateForm(event);
-				break;
-			default:
-				console.log(`Unhandled action: ${this._modalMod}`);
-				break;
-		}
+	async handleSaveForm(event) {
+		try {
+			event.preventDefault();
 
-		this.handleCloseForm();
+			this.toggleSpinner(true);
+
+			const fieldToInsert = {};
+			for (const field of this.formFields) {
+				const fieldName = typeof field === 'string' ? field : field.name;
+				if (fieldName != null && event.detail.fields[fieldName] !== undefined) {
+					fieldToInsert[fieldName] = event.detail.fields[fieldName];
+				}
+			}
+
+			const param = {
+				method    : this._modalMod === 'edit' ? 'PATCH' : 'POST',
+				body      : JSON.stringify([fieldToInsert]),
+				namedCred : this._namedCred,
+				paramsMap : {
+					object : this.objectApiName
+				}
+			};
+
+			const answer = await sendRequast(param);
+
+			if(answer.status === '200') {
+				this._recordsData = [...this._recordsData, ...answer.body];
+
+				this.dispatchEvent(new ShowToastEvent({title: 'Record was created', variant: 'success', message: JSON.stringify(answer.body)}));
+
+				await this.getRecords();
+			} else {
+				this.dispatchEvent(new ShowToastEvent({title: 'ERROR', variant: 'error', message: JSON.parse(answer.body)[0].message}))
+			}
+		} catch(error) {
+			this.dispatchEvent(new ShowToastEvent({title: 'ERROR', variant: 'error', message: error.body.message}));
+		} finally {
+			this._modalFormVisible = false;
+			this._modalMod         = 'view';
+			this.handleCloseForm();
+			this.toggleSpinner(false);
+		}
 	}
 
 	async handleObjectChange(event) {
