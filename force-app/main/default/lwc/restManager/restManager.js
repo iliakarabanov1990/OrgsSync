@@ -132,7 +132,7 @@ export default class RestManager extends LightningElement {
 	}
 
 	async connectedCallback() {
-	try {
+		try {
 			this.toggleSpinner(true);
 
 			const initialData   = await getInitialData();
@@ -324,8 +324,6 @@ export default class RestManager extends LightningElement {
 			const answer = await sendRequast(param);
 
 			if(answer.status === '200') {
-				this._recordsData = [...this._recordsData, ...answer.body];
-
 				this.dispatchEvent(new ShowToastEvent({title: 'Record was created', variant: 'success', message: JSON.stringify(answer.body)}));
 
 				await this.getRecords();
