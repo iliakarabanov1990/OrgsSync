@@ -36,7 +36,7 @@ global with sharing class RestService {
 				throw new RestServiceException('Missing query parameter: groupBy');
 			}
 
-			Integer limitParam  = String.isBlank(limitStr) ? 50000 : Integer.valueOf(limitStr);
+			Integer limitParam  = String.isBlank(limitStr)  ? null : Integer.valueOf(limitStr);
 			Integer offsetParam = String.isBlank(offsetStr) ? null : Integer.valueOf(offsetStr);
 
 			if (offsetParam == null || offsetParam > 2000) {
@@ -44,12 +44,15 @@ global with sharing class RestService {
 			}
 
 			if (String.isNotBlank(searchString)) {
+
+				if (limitParam == null) { limitParam = 2000; }
 				searchString += '*';
 
 				String soslQuery =
 				'FIND :searchString '      +
 				'IN ALL FIELDS RETURNING ' +
-				objectParam + '(' + fieldsParam + ' ORDER BY ' + groupBy + ' LIMIT :limitParam ' + 'OFFSET :offsetParam)';
+				objectParam + '(' + fieldsParam + ' ORDER BY ' + groupBy + ' LIMIT :limitParam ' + 'OFFSET :offsetParam) ' +
+				'LIMIT :limitParam';
 
 				List<List<sObject>> searchResults = Search.query(soslQuery, AccessLevel.USER_MODE);
 
@@ -57,6 +60,8 @@ global with sharing class RestService {
 
 				return searchResults[0];
 			}
+
+			if (limitParam == null) { limitParam = 50000; }
 
 			return Database.queryWithBinds (
 				'SELECT '            + fieldsParam +
