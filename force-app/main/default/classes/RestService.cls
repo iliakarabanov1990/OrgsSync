@@ -7,29 +7,29 @@ global with sharing class RestService {
 			RestRequest request = RestContext.request;
 			Map<String, String> requestParams = request.params;
 
-			String objectParam = requestParams.get('object');
+			String objectParam = requestParams?.get('object');
 			if (String.isBlank(objectParam)) {
 				RestContext.response.statusCode = 400;
 				throw new RestServiceException('Missing query parameter: object');
 			}
 			objectParam = String.escapeSingleQuotes(objectParam);
 
-			String fieldsParam = requestParams.get('fields');
+			String fieldsParam = requestParams?.get('fields');
 			if (String.isBlank(fieldsParam)) {
 				RestContext.response.statusCode = 400;
 				throw new RestServiceException('Missing query parameter: fields');
 			}
 			fieldsParam = fieldsParam.replaceAll('[^a-zA-Z0-9_,]', '');
 
-			String limitStr   = requestParams.get('limit');
-			String offsetStr  = requestParams.get('offset');
-			String groupBy    = requestParams.get('groupBy');
-			String searchString = requestParams.get('searchString');
+			String limitStr     = requestParams?.get('limit');
+			String offsetStr    = requestParams?.get('offset');
+			String groupBy      = requestParams?.get('groupBy');
+			String searchString = requestParams?.get('searchString');
 
-			limitStr     = String.isNotBlank(limitStr)     ? String.escapeSingleQuotes(limitStr)   : '';
-			offsetStr    = String.isNotBlank(offsetStr)    ? String.escapeSingleQuotes(offsetStr)  : '';
-			groupBy      = String.isNotBlank(groupBy)      ? String.escapeSingleQuotes(groupBy)     : '';
-			searchString = String.isNotBlank(searchString) ? String.escapeSingleQuotes(searchString) : '';
+			limitStr     = String.isBlank(limitStr)     ? '' : String.escapeSingleQuotes(limitStr);
+			offsetStr    = String.isBlank(offsetStr)    ? '' : String.escapeSingleQuotes(offsetStr);
+			groupBy      = String.isBlank(groupBy)      ? '' : String.escapeSingleQuotes(groupBy);
+			searchString = String.isBlank(searchString) ? '' : String.escapeSingleQuotes(searchString);
 
 			if (String.isBlank(groupBy)) {
 				RestContext.response.statusCode = 400;
@@ -49,10 +49,7 @@ global with sharing class RestService {
 				String soslQuery =
 				'FIND :searchString '      +
 				'IN ALL FIELDS RETURNING ' +
-				objectParam                + '(' + fieldsParam +
-				' ORDER BY ' + groupBy     +
-				' LIMIT :limitParam '      +
-				'OFFSET :offsetParam)';
+				objectParam + '(' + fieldsParam + ' ORDER BY ' + groupBy + ' LIMIT :limitParam ' + 'OFFSET :offsetParam)';
 
 				List<List<sObject>> searchResults = Search.query(soslQuery, AccessLevel.USER_MODE);
 
@@ -104,8 +101,8 @@ global with sharing class RestService {
 	@HttpDelete
 	global static List<sObject> deleteRecord() {
 		try {
-			String recordId    = RestContext.request.params.get('Id');
-			String objectParam = RestContext.request.params.get('object');
+			String recordId    = RestContext.request.params?.get('Id');
+			String objectParam = RestContext.request.params?.get('object');
 
 			if (String.isBlank(recordId) || String.isBlank(objectParam)) {
 				RestContext.response.statusCode = 400;
@@ -123,7 +120,7 @@ global with sharing class RestService {
 				AccessLevel.USER_MODE
 			);
 
-			if(records.size() == 0) {
+			if (records.size() == 0) {
 				RestContext.response.statusCode = 400;
 				throw new RestServiceException('Record with ID ' + recordId + ' is not exist!');
 			}
@@ -139,14 +136,15 @@ global with sharing class RestService {
 
 	global static List<SObject> getRecordToUpsert() {
 
-		RestRequest request   = RestContext.request;
+		RestRequest request        = RestContext.request;
 		Map<String, String> params = request.params;
-		String objectTypeName = (params != null) ? params.get('object') : null;
+
+		String objectTypeName = params?.get('object');
 		if (String.isBlank(objectTypeName)) {
 			RestContext.response.statusCode = 400;
 			throw new RestServiceException('Missing query parameter: object');
 		}
-		
+
 		objectTypeName = String.escapeSingleQuotes(objectTypeName);
 
 		SObjectType token = Schema.getGlobalDescribe().get(objectTypeName);

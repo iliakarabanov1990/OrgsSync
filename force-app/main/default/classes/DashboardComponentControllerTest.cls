@@ -1,41 +1,40 @@
 @isTest
 private class DashboardComponentControllerTest {
 
-    @TestSetup
-    static void setup() {
-        Rest_Settings__c rs = Rest_Settings__c.getOrgDefaults();
-        if (rs == null) {
-            rs = new Rest_Settings__c(Name = 'Default');
-        }
-        rs.Named_Credentials__c = 'TestCred';
-        rs.AccountsReportId__c = '00Oxx0000000000';
-        upsert rs;
-    }
+	@TestSetup
+	static void setup() {
+		Rest_Settings__c rs = Rest_Settings__c.getOrgDefaults();
+		if (rs == null) {
+			rs = new Rest_Settings__c(Name = 'Default');
+		}
+		rs.Named_Credentials__c = 'TestCred';
+		upsert rs;
+	}
 
-    @isTest
-    static void testGetCrossOrgDataSuccess() {
-        String reportJson = '{"factMap":{"T!T":{"rows":[],"aggregates":[{"value":0}]}}}';
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponse(200, reportJson));
+	@isTest
+	static void testGetCrossOrgDataSuccess() {
+		String reportJson = '{"factMap":{"T!T":{"rows":[],"aggregates":[{"value":0}]}}}';
+		Test.setMock(HttpCalloutMock.class, new MockHttpResponse(200, reportJson));
 
-        Test.startTest();
-        Map<String, Object> result = DashboardComponentController.getCrossOrgData();
-        Test.stopTest();
+		Test.startTest();
+		Map<String, Object> result = DashboardComponentController.getCrossOrgData();
+		Test.stopTest();
 
-        System.assertNotEquals(null, result, 'Result should not be null');
-        System.assert(result.containsKey('factMap'), 'Should contain factMap');
-    }
+		Assert.areNotEqual(null, result, 'Result should not be null');
+		Assert.isTrue(result.containsKey('factMap'), 'Should contain factMap');
+	}
 
-    @isTest
-    static void testGetCrossOrgDataError() {
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponse(404, 'Not Found'));
+	@isTest
+	static void testGetCrossOrgDataError() {
+		Test.setMock(HttpCalloutMock.class, new MockHttpResponse(404, 'Not Found'));
 
-        Test.startTest();
-        try {
-            DashboardComponentController.getCrossOrgData();
-            System.assert(false, 'Should throw AuraHandledException');
-        } catch (AuraHandledException e) {
-            System.assert(String.isNotBlank(e.getMessage()), 'Should have error message');
-        }
-        Test.stopTest();
-    }
+		Test.startTest();
+		try {
+			DashboardComponentController.getCrossOrgData();
+			System.assert(false, 'Should throw AuraHandledException');
+		} catch (AuraHandledException e) {
+			System.assert(String.isNotBlank(e.getMessage()), 'Should have error message');
+		}
+		Test.stopTest();
+	}
 }
